@@ -1,0 +1,9 @@
+{
+    "version": 3,
+    "mappings": "AAAA;;;;;;EAME",
+    "sources": [
+        "users.module.scss"
+    ],
+    "names": [],
+    "file": "users.module.css"
+}

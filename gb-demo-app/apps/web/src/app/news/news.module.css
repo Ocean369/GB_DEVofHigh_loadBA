@@ -1,0 +1,115 @@
+.card {
+  cursor: pointer;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  width: 450px;
+  border: 1px solid black;
+  padding: 10px;
+  border-radius: 15px;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+.card-body {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  gap: 5px;
+}
+
+.card-title {
+  color: cadetblue;
+  font-size: 32px;
+  margin: 0;
+  text-align: center;
+  height: 80px;
+  overflow: hidden;
+}
+
+.card-subtitle {
+  color: #417f81;
+}
+
+.card-text {
+  height: 50px;
+  overflow: hidden;
+}
+
+.news_list {
+  margin: 50px;
+  display: -ms-grid;
+  display: grid;
+  gap: 20px;
+  -ms-grid-columns: (450px)[auto-fill];
+      grid-template-columns: repeat(auto-fill, 450px);
+}
+
+.create {
+  position: absolute;
+  top: 100px;
+  left: 200px;
+  width: 500px;
+  border: 2px solid darkgray;
+  border-radius: 15px;
+  -webkit-box-shadow: 10px 5px 5px gray;
+          box-shadow: 10px 5px 5px gray;
+  padding: 20px;
+  background-color: white;
+}
+
+.create_close {
+  width: 25px;
+  -ms-grid-column-align: end;
+      justify-self: end;
+  cursor: pointer;
+}
+
+.create h1 {
+  text-align: center;
+  color: #4a997f;
+  margin-top: 0;
+}
+
+.create_form {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  gap: 10px;
+}
+
+.create_form_input {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  gap: 5px;
+}
+
+.create_form_input textarea {
+  width: 100%;
+  height: 150px;
+}
+
+.create_form_input input[type=text] {
+  width: 100%;
+}
+
+.create_form_button {
+  background-color: aquamarine;
+}
+/*# sourceMappingURL=news.module.css.map */

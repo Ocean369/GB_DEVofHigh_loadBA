@@ -1,0 +1,26 @@
+/* Your styles goes here. */
+.authorization {
+  gap:10px;
+  color:cornsilk;
+  display: flex;
+  justify-content:end;
+  align-items: center;
+}
+
+.navigator {
+  gap:10px;
+  color:cornsilk;
+  display: flex;
+  justify-content:space-between;
+}
+
+.head {
+  background: black;
+  height: 50px;
+  padding: 30px 30px
+}
+
+.linkNav {
+  text-decoration: none;
+  color: cornsilk;
+}
