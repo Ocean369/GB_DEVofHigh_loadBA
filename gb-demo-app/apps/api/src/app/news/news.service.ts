@@ -8,6 +8,8 @@ import { UsersService } from '../users/users.service';
 import { CommentsService } from './comments/comments.service';
 import { CacheService } from '../cache/cache.service';
 
+import { Cache } from 'cache-manager';
+
 export interface News {
   id?: number;
   title: string;
@@ -39,7 +41,8 @@ export class NewsService {
     private userService: UsersService,
     @Inject(forwardRef(() => CommentsService))
     private commentsService: CommentsService,
-    private cacheService: CacheService
+    private cacheService: CacheService,
+    //@Inject(CACHE_MANAGER) private cacheManager: Cache
   ) { }
 
   async create(news: CreateNewsDto): Promise<NewsEntity> {
@@ -75,7 +78,7 @@ export class NewsService {
     }
     // Если данных нет в кэше, выполняем логику получения новостей
     const _news = await this.newsRepository.find();
-    // Сохраняем полученные новости в кэше
+    //Сохраняем полученные новости в кэше
     await this.cacheService.createCache(cacheKey, _news, 3600); // Например, кэш на 1 час
 
     // Возвращаем новости

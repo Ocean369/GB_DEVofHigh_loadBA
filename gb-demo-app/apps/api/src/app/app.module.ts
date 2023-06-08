@@ -14,7 +14,8 @@ import { AuthModule } from './auth/auth.module';
 import { NewsEntity } from './news/news.entity';
 import { CommentsEntity } from './news/comments/comments.entity';
 import { UsersEntity } from './users/users.entity';
-import { CacheModule } from './cache/cache.module';
+//import { CacheModule } from './cache/cache.module';
+import { CacheModule } from '@nestjs/cache-manager'
 
 @Module({
   imports: [
@@ -38,7 +39,9 @@ import { CacheModule } from './cache/cache.module';
     AuthModule,
     EventEmitterModule.forRoot(),
     ConfigModule.forRoot(),
-    CacheModule,
+    CacheModule.register({
+      isGlobal: true,
+    })
   ],
   controllers: [AppController],
   providers: [AppService],

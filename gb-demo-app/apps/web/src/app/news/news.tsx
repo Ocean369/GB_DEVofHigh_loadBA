@@ -12,16 +12,19 @@ export interface NewsDtos {
   description: string,
   cover: string,
   user: UsersProps,
-  comments: CommentsProps[]
+  comments: CommentsProps[],
+  createdAt: string,
+  updatedAt: string
 }
 
 export interface NewsProps { }
 
 export function News(props: NewsProps) {
 
-  const [isAddNews, setIsAddNews] = useState(false);
+  // const [isAddNews, setIsAddNews] = useState(false);
 
   const [styleBlockCreate, setStyleBlockCreate] = useState('none');
+
 
 
   async function sendForm() {
@@ -49,6 +52,9 @@ export function News(props: NewsProps) {
     }, 0);
   };
 
+  const sortNews = (news: NewsDtos[]) => {
+    return news.sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt))
+  }
   // Получаем доступ к клиенту
   const queryClient = useQueryClient();
   // Запрос
@@ -60,6 +66,12 @@ export function News(props: NewsProps) {
       .then(async (response) => {
         const newsList = await response.json()
         return newsList;
+      })
+      .then(newsList => {
+        console.time('sorting');
+        const sortedNews = sortNews(newsList);
+        console.timeEnd('sorting');
+        return sortedNews
       })
   })
 

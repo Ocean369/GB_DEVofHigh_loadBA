@@ -1,13 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { CachingConfig, caching, Cache, Store } from 'cache-manager';
 import { NewsEntity } from '../news/news.entity';
 import { NewsDto } from '../news/news.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Injectable()
 export class CacheService {
-  private cacheManager: Cache<Store>;
+  //private cacheManager: Cache<Store>;
 
-  constructor() {
+  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {
     this.initializeCacheManager();
   }
 
