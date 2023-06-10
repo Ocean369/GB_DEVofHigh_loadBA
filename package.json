@@ -1,21 +1,22 @@
 {
-  "name": "@gb-demo-app/source",
+  "name": "@second-gb-app/source",
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
     "start": "nx run-many --target=serve --all",
     "start:api": "nx serve api",
     "start:web": "nx serve web --port 3002 --open",
-    "build": "nx affected:build --all --configuration=production",
+    "build": "nx exec -- nx affected:build --all --configuration=production",
     "build:api": "nx build api",
     "build:web": "nx build web",
-    "test": "nx run-many --target=test --all",
-    "test:api": "ng test api",
-    "test:web": "ng test web"
+    "test": "nx exec -- nx run-many --target=test --all",
+    "test:api": "nx test api",
+    "test:web": "nx test web"
   },
   "private": true,
   "dependencies": {
     "@nestjs-modules/mailer": "^1.8.1",
+    "@nestjs/cache-manager": "^1.0.0",
     "@nestjs/common": "^9.1.1",
     "@nestjs/config": "^2.3.2",
     "@nestjs/core": "^9.1.1",
@@ -31,7 +32,7 @@
     "@swc/helpers": "~0.5.0",
     "axios": "^1.0.0",
     "bcrypt": "^5.1.0",
-    "cache-manager": "^5.2.1",
+    "cache-manager": "^5.2.2",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "cookie": "^0.5.0",
@@ -117,5 +118,14 @@
     "tsconfig-paths": "4.2.0",
     "typescript": "~5.0.2",
     "url-loader": "^4.1.1"
+  },
+  "nx": {
+    "targets": {
+      "build": {
+        "outputs": [
+          "{projectRoot}/dist"
+        ]
+      }
+    }
   }
 }
