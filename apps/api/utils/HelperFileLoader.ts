@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-const publicPath = __dirname + '/../../public';
+const publicPath = __dirname + '/../../../public';
 let path = publicPath;
 
 export class HelperFileLoader {

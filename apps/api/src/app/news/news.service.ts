@@ -60,13 +60,13 @@ export class NewsService {
       console.log('Кэш пуст - заполним')
       const _news = await this.newsRepository.find();
       //Сохраняем полученные новости в кэше
-      await this.cacheService.createCache('news', _news, 3600); // Например, кэш на 1 час
+      await this.cacheService.createCache('news', _news, 3600000); // Например, кэш на 1 час
     }
 
     const cacheKey = 'news';
     const _news = await this.newsRepository.save(newsEntity)
     // Добавляем новость в кэш
-    await this.cacheService.addToCache(cacheKey, _news, 3600); // Например, кэш на 1 час
+    await this.cacheService.addToCache(cacheKey, _news, 3600000); // Например, кэш на 1 час
 
     return _news
   }
@@ -80,19 +80,22 @@ export class NewsService {
 
     const cacheKey = 'news';
     // Проверяем, есть ли данные в кэше
-    const cachedNews = await this.cacheService.getFromCache(cacheKey);
-
+    const cachedNews: Array<NewsEntity> = await this.cacheService.getFromCache(cacheKey);
+    //console.log('cachedNews', cachedNews.length);
     if (cachedNews) {
+      console.log('cachedNews', cachedNews.length);
+      console.log('данные есть')
       // Возвращаем данные из кэша
       return cachedNews;
+    } else {
+      // Если данных нет в кэше, выполняем логику получения новостей
+      const _news = await this.newsRepository.find();
+      //Сохраняем полученные новости в кэше
+      await this.cacheService.createCache(cacheKey, _news, 360000); // Например, кэш на 1 час
+      console.log('заполнили', await this.cacheService.getFromCache(cacheKey));
+      // Возвращаем новости
+      return _news;
     }
-    // Если данных нет в кэше, выполняем логику получения новостей
-    const _news = await this.newsRepository.find();
-    //Сохраняем полученные новости в кэше
-    await this.cacheService.createCache(cacheKey, _news, 3600); // Например, кэш на 1 час
-
-    // Возвращаем новости
-    return _news;
   }
 
   async sortAllByUserId(idUser: number): Promise<NewsEntity[] | undefined> {
@@ -110,7 +113,7 @@ export class NewsService {
       if (!cachedNews) {
         const _news = await this.newsRepository.find();
         //Сохраняем полученные новости в кэше
-        await this.cacheService.createCache('news', _news, 3600); // Например, кэш на 1 час
+        await this.cacheService.createCache('news', _news, 360000); // Например, кэш на 1 час
       }
 
       const removingNews = await this.findById(id);
@@ -140,7 +143,7 @@ export class NewsService {
       if (!cachedNews) {
         const _news = await this.newsRepository.find();
         //Сохраняем полученные новости в кэше
-        await this.cacheService.createCache('news', _news, 3600); // Например, кэш на 1 час
+        await this.cacheService.createCache('news', _news, 3600000); // Например, кэш на 1 час
       }
 
       let findNews = await this.findById(id);
@@ -152,7 +155,7 @@ export class NewsService {
         const _newsUpdated = await this.newsRepository.update(id, newsEntity)
         const cacheKey = `news:${id}`;
         // Обновляем данные в кэше
-        await this.cacheService.updateCache(cacheKey, _newsUpdated, 3600);
+        await this.cacheService.updateCache(cacheKey, _newsUpdated, 3600000);
         return 'Новость успешна изменена!'
       }
       return null

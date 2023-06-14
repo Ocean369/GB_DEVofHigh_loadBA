@@ -6,16 +6,18 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Injectable()
 export class CacheService {
-  //private cacheManager: Cache<Store>;
+  private cacheManager: Cache<Store>;
 
-  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {
+  constructor(
+    // @Inject(CACHE_MANAGER) private cacheManager: Cache
+  ) {
     this.initializeCacheManager();
   }
 
   private async initializeCacheManager() {
     this.cacheManager = await caching('memory', {
       max: 100,
-      ttl: 10 * 1000 /*milliseconds*/,
+      ttl: 100 * 1000 /*milliseconds*/,
     });
   }
 

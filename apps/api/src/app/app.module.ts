@@ -30,7 +30,7 @@ import { CacheModule } from '@nestjs/cache-manager'
       synchronize: true,
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '..', 'public'),
+      rootPath: join(__dirname, '..', '..', '..', 'public'),
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '../web'),
