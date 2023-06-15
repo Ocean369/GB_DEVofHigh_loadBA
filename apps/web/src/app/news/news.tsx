@@ -7,12 +7,12 @@ import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { getCookie } from '../../utils/cookies';
 
 export interface NewsDtos {
-  id: number
+  id: string,
   title: string,
   description: string,
   cover: string,
-  user: UsersProps,
-  comments: CommentsProps[],
+  author: string,
+  //comments: CommentsProps[],
   createdAt: string,
   updatedAt: string
 }
@@ -137,7 +137,7 @@ export function News(props: NewsProps) {
                     <p className={styles["card-title"]}>{news.title}
                     </p>
                     <p className={styles["card-subtitle"]}>Автор:
-                      {news.user.firstName}
+                      {news.author}
                     </p>
                     <img src={cover}
                       className="card-img-top"

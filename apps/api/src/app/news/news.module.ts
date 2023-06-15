@@ -1,35 +1,21 @@
-import { forwardRef, Module } from '@nestjs/common';
+import {  Module } from '@nestjs/common';
 import { NewsController } from './news.controller';
 import { NewsService } from './news.service';
-import { CommentsModule } from './comments/comments.module';
-//import { MailModule } from '../mail/mail.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { NewsEntity } from './news.entity';
-import { UsersModule } from '../users/users.module';
-import { APP_GUARD } from '@nestjs/core';
-import { RolesGuard } from '../auth/role/roles.guard';
-import { AuthModule } from '../auth/auth.module';
 import { CacheModule } from '../cache/cache.module';
-//import { CommentsModule } from './comments/comments.module';
+import { NewsSchema, News } from './schemas/news.schemas';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
   controllers: [NewsController],
   providers: [
     NewsService,
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard,
-    },
   ],
   imports: [
-    forwardRef(() => CommentsModule),
-    //MailModule,
     CacheModule,
-    UsersModule,
-    AuthModule,
-    TypeOrmModule.forFeature([NewsEntity]),
-    CommentsModule,
+    MongooseModule.forFeature([{ name: 'News', schema: NewsSchema }]),
   ],
-  exports: [NewsService, TypeOrmModule.forFeature([NewsEntity])],
+  exports: [
+    NewsService,
+  ],
 })
 export class NewsModule { }

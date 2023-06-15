@@ -1,132 +1,93 @@
-import { Injectable, forwardRef, Inject } from '@nestjs/common';
-// import { Comment } from './comments/comments.service';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { NewsEntity } from './news.entity';
+import { Injectable} from '@nestjs/common';
 import { CreateNewsDto } from './dtos/create-news-dto';
-import { UsersService } from '../users/users.service';
-import { CommentsService } from './comments/comments.service';
 import { CacheService } from '../cache/cache.service';
-
+import { Model } from 'mongoose';
+import { News, NewsSchema } from './schemas/news.schemas'
 import { Cache } from 'cache-manager';
+import { InjectModel } from '@nestjs/mongoose';
+import { EditNewsDto } from './dtos/edit-news-dto';
 
-export interface News {
-  id?: number;
-  title: string;
-  description: string;
-  // author: string;
-  // countView?: number;
-  comments?: Comment[];
-  cover?: string;
-}
-
-export interface NewsDto {
-  title?: string;
-  description?: string;
-  cover?: string
-  // author?: string;
-}
-
-export function getRandomInt(min: number = 1, max: number = 99999): number {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min)) + min; //Максимум не включается, минимум включается
-}
 
 @Injectable()
 export class NewsService {
   constructor(
-    @InjectRepository(NewsEntity)
-    private newsRepository: Repository<NewsEntity>,
-    private userService: UsersService,
-    @Inject(forwardRef(() => CommentsService))
-    private commentsService: CommentsService,
     private cacheService: CacheService,
-    //@Inject(CACHE_MANAGER) private cacheManager: Cache
+    @InjectModel('News') private readonly newsModel: Model<News>
   ) { }
 
-  async create(news: CreateNewsDto): Promise<NewsEntity> {
-    const newsEntity = new NewsEntity();
-    newsEntity.title = news.title;
-    newsEntity.description = news.description;
-    newsEntity.cover = news.cover;
-    let _user = await this.userService.findById(parseInt(news.userId));
-    _user.password = '******';
-    newsEntity.user = _user;
-    // Проверяем, есть ли данные в кэше
-    const cachedNews = await this.cacheService.getFromCache('news');
+  async create(news: CreateNewsDto): Promise<News> {
+    const _news = new News;
+    _news.author = news.author;
+    _news.title = news.title;
+    _news.description = news.description
+    _news.cover = news.cover;
+    _news.createdAt = new Date();
+    _news.updatedAt = _news.createdAt;
+    // // Проверяем, есть ли данные в кэше
+    // const cachedNews = await this.cacheService.getFromCache('news');
+    // if (!cachedNews) {
+    //   console.log('Кэш пуст - заполним')
+    //   const _newsAll = await this.newsModel.find().exec();
+    //   //Сохраняем полученные новости в кэше
+    //   await this.cacheService.createCache('news', _newsAll, 3600000); // Например, кэш на 1 час
+    // }
+    // const cacheKey = 'news';
+    const createdNews = await this.newsModel.create(_news);
+    // console.log('createdNews',createdNews);
+    // // Добавляем новость в кэш
+    // await this.cacheService.addToCache(cacheKey, createdNews , 3600000); // Например, кэш на 1 час
 
-    if (!cachedNews) {
-      console.log('Кэш пуст - заполним')
-      const _news = await this.newsRepository.find();
-      //Сохраняем полученные новости в кэше
-      await this.cacheService.createCache('news', _news, 3600000); // Например, кэш на 1 час
-    }
-
-    const cacheKey = 'news';
-    const _news = await this.newsRepository.save(newsEntity)
-    // Добавляем новость в кэш
-    await this.cacheService.addToCache(cacheKey, _news, 3600000); // Например, кэш на 1 час
-
-    return _news
+    return createdNews.save()
   }
 
-  async findById(id: News['id']): Promise<NewsEntity | null> {
-
-    return await this.newsRepository.findOneBy({ id })
+  async findById(id: string): Promise<News| null> {
+    return this.newsModel.findOne({ _id: id  }).exec();
+    //return await this.newsRepository.findOneBy({ id })
   }
 
-  async getAll(): Promise<NewsEntity[] | undefined> {
-
-    const cacheKey = 'news';
-    // Проверяем, есть ли данные в кэше
-    const cachedNews: Array<NewsEntity> = await this.cacheService.getFromCache(cacheKey);
-    //console.log('cachedNews', cachedNews.length);
-    if (cachedNews) {
-      console.log('cachedNews', cachedNews.length);
-      console.log('данные есть')
-      // Возвращаем данные из кэша
-      return cachedNews;
-    } else {
-      // Если данных нет в кэше, выполняем логику получения новостей
-      const _news = await this.newsRepository.find();
-      //Сохраняем полученные новости в кэше
-      await this.cacheService.createCache(cacheKey, _news, 360000); // Например, кэш на 1 час
-      console.log('заполнили', await this.cacheService.getFromCache(cacheKey));
-      // Возвращаем новости
-      return _news;
-    }
-  }
-
-  async sortAllByUserId(idUser: number): Promise<NewsEntity[] | undefined> {
-    return await this.newsRepository.find({
-      relations: ["comments", "user"],
-      where: { user: { id: idUser } },
-    });
-  }
-
-  async remove(id: News['id']): Promise<boolean | Error> {
+  async getAll(): Promise<News[] | undefined| Error> {
     try {
-      // Проверяем, есть ли данные в кэше
-      const cachedNews = await this.cacheService.getFromCache('news');
+    // const cacheKey = 'news';
+    // // Проверяем, есть ли данные в кэше
+    // const cachedNews: News[] = await this.cacheService.getFromCache(cacheKey);
 
-      if (!cachedNews) {
-        const _news = await this.newsRepository.find();
-        //Сохраняем полученные новости в кэше
-        await this.cacheService.createCache('news', _news, 360000); // Например, кэш на 1 час
-      }
+    // if (cachedNews) {
+    //   console.log('cachedNews', cachedNews.length);
+    //   console.log('данные есть')
+    //   // Возвращаем данные из кэша
+    //   return cachedNews;
+    // } else {
+      const _news = await this.newsModel.find().exec();
+      // //Сохраняем полученные новости в кэше
+      // await this.cacheService.createCache(cacheKey, _news, 360000); // Например, кэш на 1 час
+      // console.log('заполнили кэш');
+      // // Возвращаем новости
+      return _news;
+
+  } catch (error) {
+    return new Error(`Произошла ошибка: ${error}`)
+  }
+  }
+
+  async remove(id:string): Promise<boolean | Error> {
+    try {
+      // // Проверяем, есть ли данные в кэше
+      // const cachedNews = await this.cacheService.getFromCache('news');
+
+      // if (!cachedNews) {
+      //   const _news = await this.newsModel.find().exec();
+      //   //Сохраняем полученные новости в кэше
+      //   await this.cacheService.createCache('news', _news, 360000); // Например, кэш на 1 час
+      // }
 
       const removingNews = await this.findById(id);
       if (removingNews) {
-        const comments = await this.commentsService.findAll(id);
-        if (!(comments instanceof Error)) {
-          await this.commentsService.removeAllForIdNews(comments);
-          await this.newsRepository.delete(id);
-          const cacheKey = `news:${id}`;
-          // Удаляем данные из кэша
-          await this.cacheService.removeFromCache(cacheKey);
+          const deletedCat = await this.newsModel.findByIdAndRemove({_id: id }).exec();
+          // const cacheKey = `news:${id}`;
+          // // Удаляем данные из кэша
+          // await this.cacheService.removeFromCache(cacheKey);
           return true
-        }
+        //}
       }
       return false
     } catch (error) {
@@ -134,31 +95,36 @@ export class NewsService {
     }
   }
 
-  async update(id: News['id'], news: NewsDto | undefined): Promise<string | Error | null> {
-
+  async update(id: string, news: EditNewsDto | undefined): Promise<string | Error | null> {
     try {
       // Проверяем, есть ли данные в кэше
-      const cachedNews = await this.cacheService.getFromCache('news');
+      // const cachedNews = await this.cacheService.getFromCache('news');
 
-      if (!cachedNews) {
-        const _news = await this.newsRepository.find();
-        //Сохраняем полученные новости в кэше
-        await this.cacheService.createCache('news', _news, 3600000); // Например, кэш на 1 час
-      }
+      // if (!cachedNews) {
+      //   const _newsAll = await this.newsModel.find().exec();
+      //   //Сохраняем полученные новости в кэше
+      //   const _cache = await this.cacheService.createCache('news', _newsAll, 3600000); // Например, кэш на 1 час
+      // }
+
 
       let findNews = await this.findById(id);
       if (findNews) {
-        const newsEntity = new NewsEntity();
-        newsEntity.title = news.title || findNews.title;
-        newsEntity.description = news.description || findNews.description;
-        newsEntity.cover = news.cover || findNews.cover;
-        const _newsUpdated = await this.newsRepository.update(id, newsEntity)
-        const cacheKey = `news:${id}`;
+        const _news = new News();
+        _news.title = news.title || findNews.title;
+        _news.description = news.description || findNews.description;
+        _news.cover = news.cover || findNews.cover;
+        _news.author = findNews.author;
+        _news.createdAt = findNews.createdAt;
+        _news.updatedAt = new Date();
+        const _upd = await this.newsModel.findOneAndUpdate({_id: id }, _news, { new: true }).exec();
+        //_upd.save();
         // Обновляем данные в кэше
-        await this.cacheService.updateCache(cacheKey, _newsUpdated, 3600000);
+        ///const cacheKey = `news:${id}`;
+        //await this.cacheService.updateCache(cacheKey, _upd, 3600000);
+
         return 'Новость успешна изменена!'
       }
-      return null
+      return 'Новость не найдена'
 
     } catch (error) {
       return new Error(`Произошла ошибка: ${error}`);

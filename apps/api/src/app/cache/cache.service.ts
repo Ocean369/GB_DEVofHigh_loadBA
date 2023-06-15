@@ -1,8 +1,10 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { CachingConfig, caching, Cache, Store } from 'cache-manager';
-import { NewsEntity } from '../news/news.entity';
-import { NewsDto } from '../news/news.service';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
+//import { NewsEntity } from '../news/news.entity';
+// import { NewsDto } from '../news/news.service';
+// import { CACHE_MANAGER } from '@nestjs/cache-manager';
+
+import { News, NewsSchema } from '../news/schemas/news.schemas'
 
 @Injectable()
 export class CacheService {
@@ -21,16 +23,16 @@ export class CacheService {
     });
   }
 
-  async createCache(key: string, value: NewsEntity[], ttl: number): Promise<void> {
+  async createCache(key: string, value: News[], ttl: number): Promise<void> {
     await this.cacheManager.set(key, value, ttl);
     console.log('Заполнили кэш данными из БД ');
   }
 
-  async addToCache(key: string, value: NewsEntity, ttl: number): Promise<void> {
+  async addToCache(key: string, value: News, ttl: number): Promise<void> {
     try {
       // Получение текущего состояния кеша
       console.log()
-      let currentNews: NewsEntity[] = await this.cacheManager.get('news');
+      let currentNews: News[] = await this.cacheManager.get('news');
       if (!currentNews) {
         console.log('Cache =', currentNews);
         currentNews = [];

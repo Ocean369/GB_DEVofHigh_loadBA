@@ -1,5 +1,5 @@
 import styles from './users.module.scss';
-import { Role } from '../../../../api/src/app/auth/role/role.enum';
+//import { Role } from '../../../../api/src/app/auth/role/role.enum';
 import { NewsProps } from '../news/news';
 import { CommentsProps } from '../news/comments/comments';
 
@@ -16,7 +16,7 @@ export interface UsersProps {
 
   password: string;
 
-  roles: Role;
+  //roles: Role;
 
   news: NewsProps[];
 

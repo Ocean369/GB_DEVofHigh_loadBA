@@ -22,12 +22,12 @@ export class CreateNewsDto {
 
     @ApiProperty({
         type: String,
-        description: 'id автора статьи',
-        example: 1
+        description: 'автор статьи',
+        example: 'Masha'
     })
     @IsString()
-    @ValidateIf((o) => o.userId)
-    userId: string;
+    @IsNotEmpty()
+    author: string;
 
     @ApiProperty({
         type: String,
