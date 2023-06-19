@@ -12,6 +12,11 @@ import { diskStorage } from 'multer'
 import { HelperFileLoader } from '../../../utils/HelperFileLoader';
 import { ApiBody, ApiTags, ApiBearerAuth, ApiConsumes, ApiCreatedResponse, ApiForbiddenResponse, ApiResponse, ApiOperation } from '@nestjs/swagger';
 import { News } from './schemas/news.schemas';
+import { CacheService } from '../cache/cache.service';
+import { range } from 'rxjs';
+
+// import Redis from 'ioredis';
+// const redis = new Redis();
 
 const helperFileLoader = new HelperFileLoader();
 const PATH_NEWS = '/news_static';
@@ -27,6 +32,7 @@ function isEmptyNews(news: EditNewsDto): Boolean {
 @Controller('news')
 export class NewsController {
   constructor(private readonly newsService: NewsService,
+    private readonly cacheService: CacheService,
   ) { }
 
 
@@ -34,13 +40,7 @@ export class NewsController {
   async getAll(): Promise<News[]> {
     try {
       const news = await this.newsService.getAll();
-      if(news === undefined) {
-        return []
-      }
-      if(news instanceof Error) {
-        throw Error('Произошла ошибка при получении данных')
-      }
-      return news
+      return news || []
     } catch (error) {
       throw new Error(`Произошла ошибка при получении данных ${error}`)
     }
@@ -76,12 +76,12 @@ export class NewsController {
 
   //@UseGuards(JwtAuthGuard)
   @Delete('api/:id')
-  async remove(@Param('id') id: string): Promise<string | Error> {
+  async remove(@Param('id') id: string): Promise<string> {
     try {
       const isRemoved = this.newsService.remove(id)
-      return isRemoved ? 'Новость удалена!' : "Передан неверный идентификатор, удаление невозможно."
+      return isRemoved
     } catch (error) {
-      return new Error(`err: ${error}`);
+      throw Error(`err: ${error}`);
     }
 
   }
@@ -100,8 +100,7 @@ export class NewsController {
   async update(
     @Param('id') id: string,
     @Body() newsDto: EditNewsDto,
-    @UploadedFile() cover: Express.Multer.File,
-    @Res() response: Response): Promise<void> {
+    @UploadedFile() cover: Express.Multer.File): Promise<string> {
     try {
       if (cover?.filename) {
         newsDto.cover = PATH_NEWS + '/' + cover.filename;
@@ -109,19 +108,31 @@ export class NewsController {
 
       const news = await this.newsService.findById(id)
       if (!news) {
-        response.status(400).json({ message: 'Передан неверный идентификатор.Произвести изменения невозможно.' });
+        return 'Передан неверный идентификатор.Произвести изменения невозможно.';
       }
       if (isEmptyNews(newsDto)) {
-        response.status(400).json({ message: 'Не обнаруженно данных, в теле запроса.Произвести изменения невозможно.' });
+        return 'Не обнаруженно данных, в теле запроса.Произвести изменения невозможно.';
       }
-      //await this.mailService.sendEditNewsForAdmin(['ledix369@gmail.com'], newsDto, news)
-      response.status(200).json({ message: this.newsService.update(id, newsDto) });
+     return this.newsService.update(id, newsDto);
 
     } catch (error) {
       new Error(`err: ${error}`);
     }
   }
 
+
+//   @Get('test-redis/:searchtext')
+// async testRedis(@Param('searchtext') searchtext: string) {
+//   await this.cacheService.createCache("foo", searchtext);
+//   const _cache = await this.cacheService.getFromCache('foo');
+// return _cache;
+// }
+
+@Get('range')
+async range(){
+  return await this.cacheService.TopTenAuthor(
+    'author',
+    await this.newsService.getAll());
 }
 
-
+}
