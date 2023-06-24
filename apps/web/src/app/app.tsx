@@ -6,6 +6,8 @@ import SignIn from './sign-in/sign-in';
 import Profile from './profile/profile';
 import { QueryClient, QueryClientProvider, useQuery } from 'react-query'
 import Home from './home/home';
+import Chat from './chat/chat';
+import ChatMessage from './chat-message/chat-message';
 
 const News = lazy(() => import('./news/news'));
 
@@ -21,6 +23,11 @@ export function App() {
             <div>
               <div id="allNews" style={{ cursor: 'pointer' }}>
                 <Link to="/news/all" className={styles['linkNav']}>ALL NEWS</Link>
+              </div>
+            </div>
+            <div>
+              <div id="chat" style={{ cursor: 'pointer' }}>
+              <Link to="/chat" className={styles['linkNav']}>CHAT</Link>
               </div>
             </div>
             <div className={styles['authorization']}>
@@ -44,6 +51,7 @@ export function App() {
             <Route path="/user/profile" element={<Profile />} />
             <Route path="/signin" element={<SignIn />} />
             <Route path='/' element={<Home />}></Route>
+            <Route path='/chat' element={<Chat/>}></Route>
           </Routes>
         </Suspense>
       </div>

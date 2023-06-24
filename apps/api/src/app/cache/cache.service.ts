@@ -10,10 +10,8 @@ import { News, NewsSchema } from '../news/schemas/news.schemas'
 
 @Injectable()
 export class CacheService {
-  //private cacheManager: Cache<Store>;
   private redis: Redis;
   constructor(
-    // @Inject(CACHE_MANAGER) private cacheManager: Cache
   ) {
     this.redis = new Redis(6379);
   }
@@ -50,16 +48,6 @@ export class CacheService {
   async updateCache(key: string, value_old: string, value_upd: string): Promise<void> {
     try {
       let indexUpdate:number = await this.redis.lpos(key,value_old);
-      //const _cache = await this.redis.lrange(key,0,-1);
-      // console.log('Cache get =>',_cache);
-      console.log('find item => ',value_old);
-      // // _cache.forEach((val,i)=> {
-      // //   if (val === value_old){
-      // //     indexUpdate = i;
-       console.log('find index = ',indexUpdate);
-
-      // //   }
-      // // });
       await this.redis.lset(key,indexUpdate,value_upd);
       console.log('Изменили запись в кэш');
     } catch (error) {
@@ -69,9 +57,7 @@ export class CacheService {
 
   async getFromCache(key: string): Promise<string[]> {
     try {
-      console.log('**** GET DATE from ',key, ' *****');
       const _cache = await this.redis.lrange(key,0,-1);
-      console.log('Что лежит в кэш? => ', _cache);
       return _cache
     } catch (error) {
       throw Error(`GET. Something went wrong: ${error}`);
@@ -82,7 +68,7 @@ export class CacheService {
     try {
       //const _cache = await this.redis.lrange(key,0,-1);
       await this.redis.lrem(key,0,value);
-      console.log('Новость успешно удалена из кэш')
+      //console.log('Новость успешно удалена из кэш')
     } catch (error) {
         throw Error(`REMOVE. Something went wrong: ${error}`);
       }

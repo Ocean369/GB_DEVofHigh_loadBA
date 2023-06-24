@@ -1,0 +1,9 @@
+{
+    "version": 3,
+    "mappings": "AAAA;;;;;;EAME",
+    "sources": [
+        "chat.module.scss"
+    ],
+    "names": [],
+    "file": "chat.module.css"
+}

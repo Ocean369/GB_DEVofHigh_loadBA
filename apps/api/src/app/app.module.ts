@@ -15,8 +15,10 @@ import { ConfigModule } from '@nestjs/config';
 //import { CommentsEntity } from './news/comments/comments.entity';
 //import { UsersEntity } from './users/users.entity';
 //import { CacheModule } from './cache/cache.module';
-import { CacheModule } from '@nestjs/cache-manager'
+import { CacheModule } from '@nestjs/cache-manager';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ChatGateway } from './chat/chat.gateway';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -32,9 +34,11 @@ import { MongooseModule } from '@nestjs/mongoose';
     ConfigModule.forRoot(),
     CacheModule.register({
       isGlobal: true,
-    })
+    }),
+   // ChatGateway,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}
